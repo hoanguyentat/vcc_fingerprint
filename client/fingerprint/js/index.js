@@ -18,16 +18,4 @@ function progress(value) {
     if(value == 86) {
         $('#hint98').addClass("appear");
     }
-
-    // show/hide progress
-    /*
-       if(!progressHidden && value >= 100) {
-       progressEl.addClass("hidden");
-       progressHidden = true;
-
-       } else if(progressHidden && value < 100) {
-       progressEl.val(0);
-       progressEl.removeClass("hidden");
-       progressHidden = false;
-       }*/
 }

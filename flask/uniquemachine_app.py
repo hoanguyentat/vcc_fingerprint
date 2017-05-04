@@ -5,22 +5,24 @@ from flask_cors import CORS, cross_origin
 import json
 import hashlib
 from flaskext.mysql import MySQL
-import ConfigParser
+# import ConfigParser
 import re
 import numpy as np
-from PIL import Image
+# from PIL import Image
 import base64
-import cStringIO
+from io import StringIO
 
-root = "/home/sol315/server/uniquemachine/"
-config = ConfigParser.ConfigParser()
-config.read(root + 'password.ignore')
+root = "D:/Vccorp/FingerPrint/cross_browser/flask/"
+# config = ConfigParser.ConfigParser()
+# config.read(root + 'password.ignore')
 
 mysql = MySQL()
 app = Flask(__name__)
-app.config['MYSQL_DATABASE_USER'] = config.get('mysql', 'username')
-app.config['MYSQL_DATABASE_PASSWORD'] = config.get('mysql', 'password')
-app.config['MYSQL_DATABASE_DB'] = 'uniquemachine'
+# app.config['MYSQL_DATABASE_USER'] = config.get('mysql', 'root')
+app.config['MYSQL_DATABASE_USER'] = "root"
+# app.config['MYSQL_DATABASE_PASSWORD'] = config.get('mysql', '')
+app.config['MYSQL_DATABASE_PASSWORD'] = ""
+app.config['MYSQL_DATABASE_DB'] = 'fingerprint'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
 CORS(app)
@@ -41,7 +43,7 @@ def store_pictures():
     image_b64 = re.sub('^data:image/.+;base64,', '', image_b64)
     # decode image_b64
     image_data = image_b64.decode('base64')
-    image_data = cStringIO.StringIO(image_data)
+    image_data = StringIO.StringIO(image_data)
     image_PIL = Image.open(image_data)
     image_binary = image_PIL.tobytes().encode('hex')
 
@@ -57,6 +59,7 @@ def store_pictures():
 
 @app.route('/details', methods=['POST'])
 def details():
+    print("Get data in details\n")
     res = {}
     ID = request.get_json()["ID"]
     db = mysql.get_db()
@@ -75,20 +78,20 @@ def details():
         for i in range(len(mask)):
             fs[i] = str(int(fs[i]) & mask[i] & mac_mask[i])
         res['fonts'] = ''.join(fs)
-
+    print("Loaded data in details\n")
     return flask.jsonify(res)
 
 @app.route('/features', methods=['POST'])
 def features():
+    print("Get data in feature\n")
     agent = ""
     accept = ""
     encoding = ""
     language = ""
     IP = ""
-
     try:
         agent = request.headers.get('User-Agent')
-        accpet = request.headers.get('Accept')
+        accept = request.headers.get('Accept')
         encoding = request.headers.get('Accept-Encoding')
         language = request.headers.get('Accept-Language')
         IP = request.remote_addr
@@ -123,14 +126,10 @@ def features():
             "audio"
             ]
     
-
     result = request.get_json()
 
     single_hash = "single"
     cross_hash = "cross"
-
-    #with open("fonts.txt", 'a') as f:
-        #f.write(result['fonts'] + '\n')
 
     fonts = list(result['fonts'])
 
@@ -145,7 +144,7 @@ def features():
     result['encoding'] = encoding
     result['language'] = language
     
-    print agent
+    print ("Agent: %s\n" % agent)
            
     feature_str = "IP"
     value_str = "'" + IP + "'"
@@ -161,13 +160,11 @@ def features():
         feature_str += "," + feature
 #for gpu imgs
         if feature == "gpuImgs":
-            value = ",".join('%s_%s' % (k,v) for k,v in value.iteritems())
+            value = ",".join('%s_%s' % (k,v) for k,v in value.items())
         else:
             value = str(value)
 
-#        if feature == "cpu_cores" and type(value) != 'int':
-#           value = -1
-#fix the bug for N/A for cpu_cores
+
         if feature == 'cpu_cores':
             value = int(value)
 
@@ -182,17 +179,16 @@ def features():
         
         value_str += ",'" + str(value) + "'"
         #print feature, hash_object.hexdigest()
-
-
+        
     result['fonts'] = fonts
     for feature in cross_feature_list:
         cross_hash += str(result[feature])
-        hash_object = hashlib.md5(str(result[feature]))
+        hash_object = hashlib.md5((str(result[feature])).encode("utf-8"))
 
-    hash_object = hashlib.md5(value_str)
+    hash_object = hashlib.md5(value_str.encode("utf-8"))
     single_hash = hash_object.hexdigest()
 
-    hash_object = hashlib.md5(cross_hash)
+    hash_object = hashlib.md5(cross_hash.encode("utf-8"))
     cross_hash = hash_object.hexdigest()
 
     feature_str += ',browser_fingerprint,computer_fingerprint_1'

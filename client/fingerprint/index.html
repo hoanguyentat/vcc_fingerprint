@@ -1,8 +1,4 @@
-<html>
-<meta charset="UTF-16">
-<head>
-<title>Cross Browser Test</title>
-
+<meta charset="UTF-8">
 <script src="//cdnjs.cloudflare.com/ajax/libs/seedrandom/2.3.10/seedrandom.min.js"></script>
 <script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
@@ -27,11 +23,10 @@
   text-align: center;
 }
 </style>
-</head>
 <body>
   <div  class = "text-center" id = "status">Fingerprinting GPU...</div>
 
-<div id = "test_canvases">
+<div id = "test_canvases" style="display: none;">
 </div>
 
 <object id="fontListSWF" name="fontListSWF"
@@ -39,7 +34,7 @@
   data="fonts/FontList.swf" width="1" height="1"
 >
     <param name="movie" value="FontList.swf">
-  <embed src="FontList.swf" width="1" height="1"></embed>
+  <embed src="fonts/FontList.swf" width="1" height="1"></embed>
 </object>
 
 <script src="./js/util.js"></script>
@@ -68,4 +63,3 @@
 <script src="./js/fontdetect.js"></script>
 <script src="languages/languageDetector.js"></script>
 </body>
-</html>

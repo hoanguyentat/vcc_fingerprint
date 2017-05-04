@@ -7,8 +7,8 @@ var cross_list = {
   audio: 'Audio', 
   ratio: 'Screen Ratio',
   depth: 'Screen Depth',
-  langsdetected: 'Detected Supported Languages (Buggy and not finished)',
- // gpuimgs: 'Hash Value of GPU Rendering Results'
+  langsDetected: 'Detected Supported Languages (Buggy and not finished)',
+  gpuImgs: 'Hash Value of GPU Rendering Results'
 }
 var cnted_list = {
   timezone: 'Time Zone',
@@ -18,10 +18,10 @@ var gpu_hashes = [
   0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27
 ]
 var show_list = {
-  gpuimgs: 'Hash Value of GPU Rendering Results (partially cross_browser)',
+  gpuImgs: 'Hash Value of GPU Rendering Results (partially cross_browser)',
   WebGL: 'WebGL',
   timezone: 'Time Zone', 
-  adblock: 'Ad Block',
+  adBlock: 'Ad Block',
   agent: 'Agent',
   audio: 'Audio',
   depth: 'Screen Depth',
@@ -33,7 +33,7 @@ var show_list = {
   fonts: 'Detected Fonts',
   gpu: 'GPU',
   language: 'Language',
-  langsdetected: 'Detected Supported Languages (Buggy and not finished)',
+  langsDetected: 'Detected Supported Languages (Buggy and not finished)',
   plugins: 'Plugins'
 };
 var gpu_imgs_name = [
@@ -179,6 +179,7 @@ function gen_code() {
   }
 
   $('#cur_fingerprint').html("Current Fingerprint: " + md5(res));
+  alert("Current Fingerprint: " + md5(res));
 }
 
 function getGPUTable(hashes) {
@@ -197,7 +198,7 @@ function getGPUTable(hashes) {
 
 function getGPUString() {
   var hashes = {};
-  value = trans_data['gpuimgs'].split(',');
+  value = trans_data['gpuImgs'].split(',');
   for (hash in value) {
     cur = value[hash].split('_');
     hashes[cur[0]] = cur[1];
@@ -225,62 +226,18 @@ function getLangsString(sup) {
 
 function getTable(name) {
   if (name == "fonts") return getFontsString(trans_data[name]);
-  if (name == "gpuimgs") return getGPUString(trans_data[name]); 
-  if (name == "langsdetected") return getLangsString(trans_data[name].split('_'));
+  if (name == "gpuImgs") return getGPUString(trans_data[name]); 
+  if (name == "langsDetected") return getLangsString(trans_data[name].split('_'));
   return trans_data[name];
-}
-
-function buildTable(data) {
-  trans_data = data;
-  var list = data['resolution'].split('_');
-  trans_data['ratio'] = Math.round(list[0] / list[1] * 100) / 100;
-  data['ratio'] = trans_data['ratio'];
-  data['depth'] = list[5];//data['resolution'];
-
-  //If CPU core is not detected, N/A
-  if (data['cpu_cores'] == -1 || data['cpu_cores'] == '-1') { //here we can also use == '-1'
-    data['cpu_cores'] = 'N/A';
-  }
-
-  //convert timezone to a better way
-  var timezone = parseInt(data['timezone']);
-  var base;
-  if (timezone > 0) base = 'UTC-';
-  else base = 'UTC+';
-  data['timezone'] = 'UTC-' + (timezone / 60).toString();
-
-  $('#result_table').append('<tr><td class = "checkbox"></td><td>Feature</td><td class = "value">Value</td></tr>');
-  //$('#result_table').append('<tr><td colspan="3" class = "type">Cross-browser Features</td></tr>');
-
-
-  for (var cross in cross_list) {
-    if (cross in data) {
-      value = getTable(cross);
-      $('#result_table').append('<tr><td class = "checkbox"> <input id="box_' + cross + '"type="checkbox" onclick="gen_code();" checked></td><td class = "feature">' + cross_list[cross] + '</td><td class = "value">' + value + '</td></tr>');
-    }
-  }
-
- // $('#result_table').append('<tr><td colspan="3" class = "type">Features do not recommend for cross_browser</td></tr>');
-
-  for (var feature in show_list) {
-    //pass all the cross browser features
-    if (feature in cross_list) 
-      continue;
-    if (feature in data) {
-      value = getTable(feature);
-      $('#result_table').append('<tr><td class = "checkbox"><input id="box_' + feature + '" type="checkbox" onclick="gen_code();"></td><td class = "feature">' + show_list[feature] + '</td><td class = "value">' + value + '</td></tr>');
-    }
-  }
-
-  //disable the GPU img hashes
-  document.getElementById('box_gpuimgs').disabled = "disabled;";
 }
 
 
 function getDetails() {
-  ip_address = "sec.uniquemachine.org/uniquemachine"
-  //ip_address = "aws.songli.us:5000"
+  ip_address = "localhost:5000"
+  // ip_address = "demo-adopt.admicro.vn:5000"
+
   var ID = window.location.href.split("?")[1];
+  console.log("ID: " + ID);
   $("#cur_fingerprint").html("Current Fingerprint: " + ID);
 
   $.ajax({
@@ -290,10 +247,12 @@ function getDetails() {
     type : 'POST',
     data : JSON.stringify({"ID" : ID}),
     success : function(data) {
-      buildTable(data);
+    	console.log(data);
+      	// buildTable(data);
     },
     error: function (xhr, ajaxOptions, thrownError) {
-      alert(thrownError);
+    	console.log(thrownError);
+      	alert(thrownError);
     }
   });
 }

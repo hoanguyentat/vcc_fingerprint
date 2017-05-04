@@ -1,5 +1,5 @@
-var ip_address = "sec.uniquemachine.org/uniquemachine/";
-//var ip_address = "aws.songli.us:5000";
+var ip_address = "localhost:5000";
+// var ip_address = "demo-adopt.admicro.vn:5000";
 
 function populateFontList(fontArr) {
   fonts = [];
@@ -90,10 +90,6 @@ var Sender = function() {
     return sum;
   }
 
-  this.addFonts = function(fonts) {
-    this.postData['fontlist'] = fonts;
-  };
-
   this.nextID = 0;
   this.getID = function() {
     if (this.finalized) {
@@ -109,10 +105,6 @@ var Sender = function() {
       idList.push(this.getID());
     }
     return idList;
-  };
-
-  this.postLangsDetected = function(data) {
-    //this.postData['langsDetected'] = data;
   };
 
   this.getDataFromCanvas = function(ctx, id) {
@@ -177,9 +169,7 @@ var Sender = function() {
   this.urls = [];
   this.finished = 0;
 
-  this.toServer = function(
-      WebGL, inc, gpu, hash, id,
-      dataurl) { // send messages to server and receive messages from server
+  this.toServer = function(WebGL, inc, gpu, hash, id, dataurl) { // send messages to server and receive messages from server
 
     this.postData['gpuImgs'][id] = dataurl.hashCode();
 
@@ -249,7 +239,9 @@ var Sender = function() {
       $('#status').html("Waitting for the server...");
       startSend(this.postData);
 
+
       function startSend(postData){
+        console.log(postData);
         $.ajax({
           url : "http://" + ip_address + "/features",
           dataType : "json",
@@ -258,14 +250,15 @@ var Sender = function() {
           data : JSON.stringify(postData),
           success : function(data) {
             console.log(data);
-            //parent.postMessage(data,"http://127.0.0.1:9876");
-            parent.postMessage(data,"http://uniquemachine.org");
+            parent.postMessage(data,"http://localhost:8000");
+            // parent.postMessage(data,"http://demo-adopt.admicro.vn:8000");
+            $('#status').addClass("hide");
           },
           error: function (xhr, ajaxOptions, thrownError) {
+            // alert("Xuất hiện lỗi!")
             alert(thrownError);
           }
         });
-
       }
 
   }
